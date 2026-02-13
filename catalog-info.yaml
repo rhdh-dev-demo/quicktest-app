@@ -1,0 +1,94 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: quicktest-app
+  description: A Node.js application
+  annotations:
+    # TechDocs - Documentation as code
+    backstage.io/techdocs-ref: dir:.
+
+    # GitHub - PRs, Issues, Actions
+    github.com/project-slug: rhdh-dev-demo/quicktest-app
+    
+    # ArgoCD - Deployment status
+    argocd/app-selector: rhdh-demo/application=quicktest-app
+    
+    # Kubernetes Topology - Pods, logs
+    backstage.io/kubernetes-id: quicktest-app
+    
+    # Tekton - Pipeline runs
+    tekton.dev/pipeline: quicktest-app-build
+    tekton.dev/cicd: 'true'
+    
+    # Quay - Image security (if using Quay)
+    quay.io/repository-slug: quicktest-app-dev/quicktest-app
+  labels:
+    app.kubernetes.io/name: quicktest-app
+    app.kubernetes.io/part-of: quicktest-app-system
+  tags:
+    - nodejs
+    - tekton
+    - argocd
+    - gitops
+  links:
+    - url: https://github.com/rhdh-dev-demo/quicktest-app
+      title: Source Code
+      icon: github
+    - url: https://github.com/rhdh-dev-demo/quicktest-app-gitops
+      title: GitOps Repository
+      icon: github
+    - url: https://openshift-gitops-server-openshift-gitops.apps.rosa.nj88g-soani-kii.ivwd.p3.openshiftapps.com/applications/quicktest-app-dev
+      title: ArgoCD - DEV
+      icon: dashboard
+    - url: https://openshift-gitops-server-openshift-gitops.apps.rosa.nj88g-soani-kii.ivwd.p3.openshiftapps.com/applications/quicktest-app-staging
+      title: ArgoCD - Staging
+      icon: dashboard
+    - url: https://openshift-gitops-server-openshift-gitops.apps.rosa.nj88g-soani-kii.ivwd.p3.openshiftapps.com/applications/quicktest-app-prod
+      title: ArgoCD - PROD
+      icon: dashboard
+    - url: https://console-openshift-console.apps.rosa.nj88g-soani-kii.ivwd.p3.openshiftapps.com/k8s/ns/quicktest-app-dev/deployments
+      title: OpenShift Console - DEV
+      icon: web
+    - url: https://console-openshift-console.apps.rosa.nj88g-soani-kii.ivwd.p3.openshiftapps.com/k8s/ns/quicktest-app-prod/deployments
+      title: OpenShift Console - PROD
+      icon: web
+    - url: https://image-registry.openshift-image-registry.svc:5000/quicktest-app-dev/quicktest-app
+      title: Container Image
+      icon: docker
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/ui-team
+  system: quicktest-app-system
+  providesApis:
+    - quicktest-app-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: quicktest-app-system
+  description: System for quicktest-app application
+  tags:
+    - nodejs
+spec:
+  owner: group:default/ui-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: quicktest-app-api
+  description: REST API for quicktest-app
+  tags:
+    - rest
+    - openapi
+  links:
+    - url: https://quicktest-app-quicktest-app-dev.apps.rosa.nj88g-soani-kii.ivwd.p3.openshiftapps.com/health
+      title: Health Endpoint (DEV)
+      icon: web
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:default/ui-team
+  system: quicktest-app-system
+  definition:
+    $text: ./api/openapi.yaml
